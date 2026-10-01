@@ -1,0 +1,990 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Campus Club Members</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background: #f4f6f8;
+            color: #222;
+        }
+
+        header {
+            background: #172554;
+            color: white;
+            padding: 25px;
+            text-align: center;
+        }
+
+        header h1 {
+            margin-bottom: 8px;
+        }
+
+        header p {
+            color: #dbeafe;
+        }
+
+        .container {
+            width: 92%;
+            max-width: 1200px;
+            margin: 30px auto;
+        }
+
+        .card {
+            background: white;
+            padding: 25px;
+            margin-bottom: 25px;
+            border-radius: 12px;
+            box-shadow: 0 3px 12px rgba(0,0,0,0.08);
+        }
+
+        .card h2 {
+            color: #172554;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #e5e7eb;
+            padding-bottom: 10px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+
+        input,
+        select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            font-size: 15px;
+        }
+
+        button {
+            padding: 11px 18px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            color: white;
+            background: #2563eb;
+            font-size: 14px;
+            margin-top: 10px;
+        }
+
+        button:hover {
+            opacity: 0.9;
+        }
+
+        .danger {
+            background: #dc2626;
+        }
+
+        .success {
+            background: #16a34a;
+        }
+
+        .warning {
+            background: #d97706;
+        }
+
+        .secondary {
+            background: #475569;
+        }
+
+        .result {
+            margin-top: 20px;
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+
+        th,
+        td {
+            border: 1px solid #d1d5db;
+            padding: 10px;
+            text-align: left;
+        }
+
+        th {
+            background: #172554;
+            color: white;
+        }
+
+        tr:nth-child(even) {
+            background: #f8fafc;
+        }
+
+        .message {
+            padding: 12px;
+            margin-top: 15px;
+            border-radius: 6px;
+            background: #dbeafe;
+            color: #1e3a8a;
+        }
+
+        .error {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .section-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        @media (max-width: 700px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .container {
+                width: 95%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<header>
+    <h1>Campus Club Members</h1>
+    <p>Member Management System</p>
+</header>
+
+<div class="container">
+
+    <!-- ADD MEMBER -->
+    <div class="card">
+        <h2>1. Add Club Member</h2>
+
+        <form id="addMemberForm">
+
+            <div class="form-grid">
+
+                <input
+                    type="text"
+                    id="memberId"
+                    placeholder="Member ID"
+                    required
+                >
+
+                <input
+                    type="text"
+                    id="name"
+                    placeholder="Name"
+                    required
+                >
+
+                <input
+                    type="text"
+                    id="clubName"
+                    placeholder="Club Name"
+                    required
+                >
+
+                <input
+                    type="number"
+                    id="yearOfStudy"
+                    placeholder="Year of Study"
+                    min="1"
+                    max="5"
+                    required
+                >
+
+                <input
+                    type="text"
+                    id="role"
+                    placeholder="Role"
+                    required
+                >
+
+                <input
+                    type="number"
+                    id="points"
+                    placeholder="Points"
+                    min="0"
+                    required
+                >
+
+                <input
+                    type="text"
+                    id="interests"
+                    placeholder="Interests"
+                    required
+                >
+
+                <select id="status" required>
+                    <option value="">Select Status</option>
+                    <option value="Active">Active</option>
+                    <option value="Inactive">Inactive</option>
+                </select>
+
+            </div>
+
+            <button type="submit" class="success">
+                Add Member
+            </button>
+
+        </form>
+
+        <div id="addMessage"></div>
+    </div>
+
+
+    <!-- VIEW ALL MEMBERS -->
+    <div class="card">
+
+        <h2>2. All Club Members</h2>
+
+        <button onclick="loadMembers()" class="secondary">
+            View All Members
+        </button>
+
+        <div id="allMembersResult" class="result"></div>
+
+    </div>
+
+
+    <!-- SEARCH MEMBER -->
+    <div class="card">
+
+        <h2>3. Search Member by Member ID</h2>
+
+        <div class="form-grid">
+
+            <input
+                type="text"
+                id="searchMemberId"
+                placeholder="Enter Member ID"
+            >
+
+        </div>
+
+        <button onclick="searchMember()">
+            Search Member
+        </button>
+
+        <div id="searchResult" class="result"></div>
+
+    </div>
+
+
+    <!-- CLUB + POINTS -->
+    <div class="card">
+
+        <h2>4. Club Members with More Than Specified Points</h2>
+
+        <div class="form-grid">
+
+            <input
+                type="text"
+                id="filterClub"
+                placeholder="Club Name"
+            >
+
+            <input
+                type="number"
+                id="minimumPoints"
+                placeholder="Minimum Points"
+            >
+
+        </div>
+
+        <button onclick="filterClubMembers()">
+            Search
+        </button>
+
+        <div id="clubResult" class="result"></div>
+
+    </div>
+
+
+    <!-- SELECTED MEMBER DETAILS -->
+    <div class="card">
+
+        <h2>5. Display Selected Member Details</h2>
+
+        <p>
+            Displays only Name, Club Name, Role and Points.
+        </p>
+
+        <input
+            type="text"
+            id="detailsMemberId"
+            placeholder="Enter Member ID"
+        >
+
+        <button onclick="showMemberDetails()">
+            Show Details
+        </button>
+
+        <div id="detailsResult" class="result"></div>
+
+    </div>
+
+
+    <!-- UPDATE MEMBER -->
+    <div class="card">
+
+        <h2>6. Update Member Role and Points</h2>
+
+        <div class="form-grid">
+
+            <input
+                type="text"
+                id="updateMemberId"
+                placeholder="Member ID"
+            >
+
+            <input
+                type="text"
+                id="updateRole"
+                placeholder="New Role"
+            >
+
+            <input
+                type="number"
+                id="updatePoints"
+                placeholder="New Points"
+            >
+
+        </div>
+
+        <button onclick="updateMember()" class="warning">
+            Update Member
+        </button>
+
+        <div id="updateResult" class="result"></div>
+
+    </div>
+
+
+    <!-- INCREASE CLUB POINTS -->
+    <div class="card">
+
+        <h2>7. Increase Points for Club Members</h2>
+
+        <div class="form-grid">
+
+            <input
+                type="text"
+                id="increaseClub"
+                placeholder="Club Name"
+            >
+
+            <input
+                type="number"
+                id="increasePoints"
+                placeholder="Points to Increase"
+            >
+
+        </div>
+
+        <button onclick="increaseClubPoints()" class="success">
+            Increase Points
+        </button>
+
+        <div id="increaseResult" class="result"></div>
+
+    </div>
+
+
+    <!-- POINT RANGE -->
+    <div class="card">
+
+        <h2>8. Search Members by Points Range</h2>
+
+        <div class="form-grid">
+
+            <input
+                type="number"
+                id="minPoints"
+                placeholder="Minimum Points"
+            >
+
+            <input
+                type="number"
+                id="maxPoints"
+                placeholder="Maximum Points"
+            >
+
+        </div>
+
+        <button onclick="searchByPoints()">
+            Search Range
+        </button>
+
+        <div id="rangeResult" class="result"></div>
+
+    </div>
+
+
+    <!-- DELETE MEMBER -->
+    <div class="card">
+
+        <h2>9. Delete Member</h2>
+
+        <input
+            type="text"
+            id="deleteMemberId"
+            placeholder="Enter Member ID"
+        >
+
+        <button onclick="deleteMember()" class="danger">
+            Delete Member
+        </button>
+
+        <div id="deleteResult" class="result"></div>
+
+    </div>
+
+
+    <!-- FINAL SORTED MEMBERS -->
+    <div class="card">
+
+        <h2>10. Final Members - Descending Points</h2>
+
+        <button onclick="loadMembers()" class="secondary">
+            Display Final Records
+        </button>
+
+        <div id="finalResult" class="result"></div>
+
+    </div>
+
+</div>
+
+
+<script>
+
+    // ----------------------------------------
+    // CREATE TABLE
+    // ----------------------------------------
+
+    function createTable(members, fields) {
+
+        if (!members || members.length === 0) {
+            return "<div class='message'>No members found.</div>";
+        }
+
+        let html = "<table>";
+
+        html += "<tr>";
+
+        fields.forEach(field => {
+            html += `<th>${field.label}</th>`;
+        });
+
+        html += "</tr>";
+
+        members.forEach(member => {
+
+            html += "<tr>";
+
+            fields.forEach(field => {
+
+                html += `<td>${member[field.key] ?? ""}</td>`;
+
+            });
+
+            html += "</tr>";
+
+        });
+
+        html += "</table>";
+
+        return html;
+    }
+
+
+    // ----------------------------------------
+    // ADD MEMBER
+    // ----------------------------------------
+
+    document.getElementById("addMemberForm")
+        .addEventListener("submit", async function(event) {
+
+            event.preventDefault();
+
+            const member = {
+
+                memberId:
+                    document.getElementById("memberId").value,
+
+                name:
+                    document.getElementById("name").value,
+
+                clubName:
+                    document.getElementById("clubName").value,
+
+                yearOfStudy:
+                    Number(document.getElementById("yearOfStudy").value),
+
+                role:
+                    document.getElementById("role").value,
+
+                points:
+                    Number(document.getElementById("points").value),
+
+                interests:
+                    document.getElementById("interests").value,
+
+                status:
+                    document.getElementById("status").value
+            };
+
+
+            try {
+
+                const response = await fetch("/members", {
+
+                    method: "POST",
+
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+
+                    body: JSON.stringify(member)
+
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+
+                    document.getElementById("addMessage").innerHTML =
+                        `<div class="message">
+                            Member added successfully!
+                        </div>`;
+
+                    document.getElementById("addMemberForm").reset();
+
+                    loadMembers();
+
+                } else {
+
+                    document.getElementById("addMessage").innerHTML =
+                        `<div class="message error">
+                            ${data.error || data.message}
+                        </div>`;
+
+                }
+
+            } catch (error) {
+
+                document.getElementById("addMessage").innerHTML =
+                    `<div class="message error">
+                        ${error.message}
+                    </div>`;
+
+            }
+
+        });
+
+
+    // ----------------------------------------
+    // LOAD ALL MEMBERS
+    // ----------------------------------------
+
+    async function loadMembers() {
+
+        try {
+
+            const response = await fetch("/members");
+
+            const members = await response.json();
+
+            const fields = [
+
+                { key: "memberId", label: "Member ID" },
+                { key: "name", label: "Name" },
+                { key: "clubName", label: "Club Name" },
+                { key: "yearOfStudy", label: "Year" },
+                { key: "role", label: "Role" },
+                { key: "points", label: "Points" },
+                { key: "interests", label: "Interests" },
+                { key: "status", label: "Status" }
+
+            ];
+
+            const table = createTable(members, fields);
+
+            document.getElementById("allMembersResult").innerHTML = table;
+
+            document.getElementById("finalResult").innerHTML = table;
+
+        } catch (error) {
+
+            alert(error.message);
+
+        }
+
+    }
+
+
+    // ----------------------------------------
+    // SEARCH MEMBER BY ID
+    // ----------------------------------------
+
+    async function searchMember() {
+
+        const memberId =
+            document.getElementById("searchMemberId").value;
+
+        try {
+
+            const response =
+                await fetch(`/members/id/${encodeURIComponent(memberId)}`);
+
+            const member = await response.json();
+
+            if (!response.ok) {
+
+                document.getElementById("searchResult").innerHTML =
+                    `<div class="message error">
+                        ${member.message}
+                    </div>`;
+
+                return;
+
+            }
+
+            const fields = [
+
+                { key: "memberId", label: "Member ID" },
+                { key: "name", label: "Name" },
+                { key: "clubName", label: "Club Name" },
+                { key: "yearOfStudy", label: "Year" },
+                { key: "role", label: "Role" },
+                { key: "points", label: "Points" },
+                { key: "interests", label: "Interests" },
+                { key: "status", label: "Status" }
+
+            ];
+
+            document.getElementById("searchResult").innerHTML =
+                createTable([member], fields);
+
+        } catch (error) {
+
+            alert(error.message);
+
+        }
+
+    }
+
+
+    // ----------------------------------------
+    // CLUB + POINTS FILTER
+    // ----------------------------------------
+
+    async function filterClubMembers() {
+
+        const club =
+            document.getElementById("filterClub").value;
+
+        const points =
+            document.getElementById("minimumPoints").value;
+
+        try {
+
+            const response =
+                await fetch(
+                    `/members/club/${encodeURIComponent(club)}/${points}`
+                );
+
+            const members = await response.json();
+
+            const fields = [
+
+                { key: "memberId", label: "Member ID" },
+                { key: "name", label: "Name" },
+                { key: "clubName", label: "Club" },
+                { key: "points", label: "Points" },
+                { key: "role", label: "Role" }
+
+            ];
+
+            document.getElementById("clubResult").innerHTML =
+                createTable(members, fields);
+
+        } catch (error) {
+
+            alert(error.message);
+
+        }
+
+    }
+
+
+    // ----------------------------------------
+    // SELECTED MEMBER DETAILS
+    // ----------------------------------------
+
+    async function showMemberDetails() {
+
+        const memberId =
+            document.getElementById("detailsMemberId").value;
+
+        try {
+
+            const response =
+                await fetch(
+                    `/members/details/${encodeURIComponent(memberId)}`
+                );
+
+            const member = await response.json();
+
+            if (!member) {
+
+                document.getElementById("detailsResult").innerHTML =
+                    `<div class="message error">
+                        Member not found
+                    </div>`;
+
+                return;
+
+            }
+
+            const fields = [
+
+                { key: "name", label: "Name" },
+                { key: "clubName", label: "Club Name" },
+                { key: "role", label: "Role" },
+                { key: "points", label: "Points" }
+
+            ];
+
+            document.getElementById("detailsResult").innerHTML =
+                createTable([member], fields);
+
+        } catch (error) {
+
+            alert(error.message);
+
+        }
+
+    }
+
+
+    // ----------------------------------------
+    // UPDATE MEMBER
+    // ----------------------------------------
+
+    async function updateMember() {
+
+        const memberId =
+            document.getElementById("updateMemberId").value;
+
+        const role =
+            document.getElementById("updateRole").value;
+
+        const points =
+            Number(document.getElementById("updatePoints").value);
+
+        try {
+
+            const response =
+                await fetch(`/members/${encodeURIComponent(memberId)}`, {
+
+                    method: "PUT",
+
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+
+                    body: JSON.stringify({
+                        role: role,
+                        points: points
+                    })
+
+                });
+
+            const member = await response.json();
+
+            if (!response.ok) {
+
+                document.getElementById("updateResult").innerHTML =
+                    `<div class="message error">
+                        ${member.message || member.error}
+                    </div>`;
+
+                return;
+
+            }
+
+            document.getElementById("updateResult").innerHTML =
+                `<div class="message">
+                    Member updated successfully.<br>
+                    Role: ${member.role}<br>
+                    Points: ${member.points}
+                </div>`;
+
+        } catch (error) {
+
+            alert(error.message);
+
+        }
+
+    }
+
+
+    // ----------------------------------------
+    // INCREASE CLUB POINTS
+    // ----------------------------------------
+
+    async function increaseClubPoints() {
+
+        const club =
+            document.getElementById("increaseClub").value;
+
+        const points =
+            document.getElementById("increasePoints").value;
+
+        try {
+
+            const response =
+                await fetch(
+                    `/members/club/${encodeURIComponent(club)}/increase/${points}`,
+                    {
+                        method: "PUT"
+                    }
+                );
+
+            const data = await response.json();
+
+            document.getElementById("increaseResult").innerHTML =
+                `<div class="message">
+                    ${data.message}<br>
+                    Members modified: ${data.modifiedCount}
+                </div>`;
+
+            loadMembers();
+
+        } catch (error) {
+
+            alert(error.message);
+
+        }
+
+    }
+
+
+    // ----------------------------------------
+    // POINT RANGE SEARCH
+    // ----------------------------------------
+
+    async function searchByPoints() {
+
+        const min =
+            document.getElementById("minPoints").value;
+
+        const max =
+            document.getElementById("maxPoints").value;
+
+        try {
+
+            const response =
+                await fetch(`/members/points/${min}/${max}`);
+
+            const members = await response.json();
+
+            const fields = [
+
+                { key: "memberId", label: "Member ID" },
+                { key: "name", label: "Name" },
+                { key: "clubName", label: "Club" },
+                { key: "role", label: "Role" },
+                { key: "points", label: "Points" }
+
+            ];
+
+            document.getElementById("rangeResult").innerHTML =
+                createTable(members, fields);
+
+        } catch (error) {
+
+            alert(error.message);
+
+        }
+
+    }
+
+
+    // ----------------------------------------
+    // DELETE MEMBER
+    // ----------------------------------------
+
+    async function deleteMember() {
+
+        const memberId =
+            document.getElementById("deleteMemberId").value;
+
+        if (!confirm(`Delete member ${memberId}?`)) {
+            return;
+        }
+
+        try {
+
+            const response =
+                await fetch(`/members/${encodeURIComponent(memberId)}`, {
+
+                    method: "DELETE"
+
+                });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+
+                document.getElementById("deleteResult").innerHTML =
+                    `<div class="message error">
+                        ${data.message || data.error}
+                    </div>`;
+
+                return;
+
+            }
+
+            document.getElementById("deleteResult").innerHTML =
+                `<div class="message">
+                    Member deleted successfully!
+                </div>`;
+
+            document.getElementById("deleteMemberId").value = "";
+
+            loadMembers();
+
+        } catch (error) {
+
+            alert(error.message);
+
+        }
+
+    }
+
+
+    // Load members when page opens
+    window.onload = function() {
+        loadMembers();
+    };
+
+</script>
+
+</body>
+</html>
